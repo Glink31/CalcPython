@@ -6,7 +6,7 @@
   (https://en.wikipedia.org/wiki/Backus%E2%80%93Naur_form)
 
   <expr> ::= <term> + <expr> | <term> - <expr> | <term>
-  <term> ::= <factor> * <term> | <factor> / <term> | <factor>
+  <term> ::= <factor> * <term> | <factor> / <term> | <factor> % <term> | <factor>
   <factor> ::= ( <expr> ) | <number>
 
 """
@@ -16,7 +16,8 @@ from Expressions import (
     SubtractOperation,
     MultiplyOperation,
     DivideOperation,
-    NumberExpr
+    NumberExpr,
+    ModuleOperation
 )
 from .parser_error import ParserError
 from .programmer_error import ProgrammerError
@@ -118,7 +119,7 @@ class TermParser:
         if pos == len(source):
             return left, pos
 
-        if source[pos] == '*' or source[pos] == '/':
+        if source[pos] == '*' or source[pos] == '/' or source[pos] == "%":
             op = source[pos]
             pos += 1
             pos = skip_spaces(source, pos)
@@ -131,6 +132,8 @@ class TermParser:
                 return MultiplyOperation(left, right), pos
             if op == '/':
                 return DivideOperation(left, right), pos
+            if op == '%':
+                return ModuleOperation(left, right), pos
 
             raise ProgrammerError("Invalid parser state")
 
